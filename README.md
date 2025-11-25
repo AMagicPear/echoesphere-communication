@@ -1,0 +1,2 @@
+# Echoesphere Communication
+Echoesphere的子项目。运行在树莓派上，用于读取传感器数据并将其发送到Echoesphere的主服务器以及接收主服务器的指令控制灯带变换。

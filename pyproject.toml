@@ -1,0 +1,7 @@
+[project]
+name = "echoesphere-communication"
+version = "0.1.0"
+description = "Communication module for echoesphere running on Raspberry Pi"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
