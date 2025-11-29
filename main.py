@@ -1,6 +1,9 @@
+import json
 import socket
 import threading
 import time
+
+from led_control.ws2812b_test import pixels
 
 HOST = '0.0.0.0'
 PORT = 65432
@@ -21,12 +24,27 @@ def handle_client(conn, addr):
         while True:
             conn.sendall(b"Hello, client!")
             data = conn.recv(1024)
-            if not data:
-                break
-            print(f"Received data from {addr}: {data.decode()}")
+            if data:
+                print(f"Received data from {addr}:")
+                data_key_value = json.loads(data.decode())
+                print(data_key_value)
+                if "HitBlockColor" in data_key_value:
+                    hit_block_color = data_key_value["HitBlockColor"]
+                    match hit_block_color:
+                        case "Red":
+                            pixels.fill((255, 0, 0))
+                        case "Green":
+                            pixels.fill((0, 255, 0))
+                        case "Blue":
+                            pixels.fill((0, 0, 255))
+                        case "Orange":
+                            pixels.fill((255, 80, 0))
+                        case _:
+                            pixels.fill((0, 0, 0))
+                    pixels.show()
             time.sleep(0.01)
-    except ConnectionResetError:
-        print(f"Connection reset by {addr}")
+    except Exception as e:
+        print(f"Error: {e}")
     finally:
         conn.close()
         print(f"Connection closed with {addr}")
