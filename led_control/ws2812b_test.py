@@ -2,32 +2,36 @@ import board
 import neopixel
 import time
 
-pixel_pin = board.D18
-num_pixels = 10
+pixel_pin_1 = board.D23
+num_pixels_1 = 150
 
-pixels = neopixel.NeoPixel(pixel_pin, num_pixels, auto_write=False, brightness=0.05)
+pixel_pin_2 = board.D18
+num_pixels_2 = 101
+
+pixels_1 = neopixel.NeoPixel(
+    pixel_pin_1, num_pixels_1, auto_write=False, brightness=0.2
+)
+pixels_2 = neopixel.NeoPixel(
+    pixel_pin_2, num_pixels_2, auto_write=False, brightness=0.2
+)
+
+pixels = pixels_2
 
 if __name__ == "__main__":
-    for i in range(num_pixels):
-        pixels.fill((0, 0, 0))
-        for j in range(0, i):
-            pixels[j] = (255, j * 20 % 255, 0)
-        pixels.show()
-        time.sleep(0.5)
-    # while True:
-    #     # 全红
-    #     pixels.fill((255, 0, 0))
-    #     pixels.show()
-    #     time.sleep(1)
-
-    #     # 全绿
-    #     pixels.fill((0, 255, 0))
-    #     pixels.show()
-    #     time.sleep(1)
-
-    #     # 跑马灯
-    #     for i in range(num_pixels):
-    #         pixels.fill((0, 0, 0))
-    #         pixels[i] = (195, 175, 76)
-    #         pixels.show()
-    #         time.sleep(0.05)
+    for i in range(max(num_pixels_1, num_pixels_2)):
+        pixels_1.fill((0, 0, 0))
+        pixels_2.fill((0, 0, 0))
+        pixels_1[i] = (255, 0, 0)
+        if i < num_pixels_1 - 1:
+            pixels_1[i+1] = (0, 0, 255)
+        if i < num_pixels_2:
+            pixels_2[i] = (0, 255, 0)
+        if 2 * i < num_pixels_1:
+            pixels_1[2 * i] = (0, 0, 255)
+        if 2 * i + 1 < num_pixels_1:
+            pixels_1[2 * i + 1] = (255, 255, 0)
+        pixels_1.show()
+        pixels_2.show()
+        time.sleep(0.05)
+    pixels_1.deinit()
+    pixels_2.deinit()
