@@ -10,3 +10,5 @@ wheels/
 .venv
 # 不知道什么玩意
 .lgd-nfy0
+
+logs/
