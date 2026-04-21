@@ -2,6 +2,7 @@ import board
 import neopixel
 import time
 import threading
+import colorsys
 
 
 class LedController:
@@ -27,49 +28,43 @@ class LedController:
             time.sleep(0.05)
 
     def _breathing_loop(self):
-        colors = [
-            (255, 0, 0),
-            (255, 127, 0),
-            (255, 255, 0),
-            (0, 255, 0),
-            (0, 255, 255),
-            (0, 0, 255),
-            (127, 0, 255),
-            (255, 0, 127),
-        ]
+        num_steps = 200
+        sleep_time = 0.02
+        hue = 0.0
         while not self._stop_flag.is_set():
-            for color in colors:
+            for i in range(num_steps):
                 if self._stop_flag.is_set():
                     break
-                for brightness in [0.1, 0.3, 0.5, 0.3]:
-                    if self._stop_flag.is_set():
-                        break
-                    self.pixels.fill(color)
-                    self.pixels.brightness = brightness
-                    self.pixels.show()
-                    time.sleep(0.5)
+                progress = i / num_steps
+                brightness = (1 - abs(2 * progress - 1)) * 0.8 + 0.1
+                r, g, b = colorsys.hls_to_rgb(hue, brightness, 1.0)
+                self.pixels.fill((int(r * 255), int(g * 255), int(b * 255)))
+                self.pixels.show()
+                time.sleep(sleep_time)
+            hue = (hue + 0.05) % 1.0
 
     def _rainbow_chase_loop(self):
-        colors = [
-            (255, 0, 0),
-            (255, 127, 0),
-            (255, 255, 0),
-            (0, 255, 0),
-            (0, 255, 255),
-            (0, 0, 255),
-            (127, 0, 255),
-            (255, 0, 127),
-        ]
-        color_idx = 0
+        num_heads = 5
+        tail_length = 15
+        speed = 2
+        pixel_count = self.pixels.n
+        positions = [0] * num_heads
+        hues = [i / num_heads for i in range(num_heads)]
         while not self._stop_flag.is_set():
-            for i in range(self.pixels.n):
-                if self._stop_flag.is_set():
-                    break
-                self.pixels.fill((0, 0, 0))
-                self.pixels[i] = colors[color_idx]
-                self.pixels.show()
-                time.sleep(0.05)
-            color_idx = (color_idx + 1) % len(colors)
+            self.pixels.fill((0, 0, 0))
+            for head in range(num_heads):
+                for t in range(tail_length, 0, -1):
+                    idx = (positions[head] - t) % pixel_count
+                    fade = (1 - t / tail_length) * 0.9 + 0.1
+                    r, g, b = colorsys.hls_to_rgb(hues[head], 0.5 * fade, 1.0)
+                    self.pixels[idx] = (int(r * 255), int(g * 255), int(b * 255))
+                head_brightness = colorsys.hls_to_rgb(hues[head], 0.5, 1.0)
+                self.pixels[positions[head]] = (int(head_brightness[0] * 255), int(head_brightness[1] * 255), int(head_brightness[2] * 255))
+            self.pixels.show()
+            time.sleep(0.03)
+            for head in range(num_heads):
+                positions[head] = (positions[head] + speed) % pixel_count
+            hues = [(h + 0.008) % 1.0 for h in hues]
 
     def green_chase(self):
         self._start_effect(lambda: self._chase_loop((0, 255, 0)))
