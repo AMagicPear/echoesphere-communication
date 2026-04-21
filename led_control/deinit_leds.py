@@ -1,4 +1,3 @@
-from ws2812b_test import pixels_1, pixels_2
+from ws2812b_test import pixels
 
-pixels_1.deinit()
-pixels_2.deinit()
+pixels.deinit()
