@@ -37,12 +37,8 @@ JSON message types: `text`, `image`, `command`, `register`
 
 ## LED Commands
 
-The server sends these commands to control LED effects:
-- `green` - Green chase loop
-- `red` - Red chase loop
-- `blue` - Blue chase loop
-- `rainbow` - Rainbow color cycle chase
-- `breathing` - Pulsing brightness effect
+The server sends color names as commands, which are translated to RGB tuples:
+- `green`, `red`, `blue`, `white`, `yellow`, `cyan`, `magenta` - Chase loop with that color
 - `off` - Turn off all LEDs
 
 ## Key Dependencies

@@ -1,8 +1,8 @@
 import asyncio
-from client import TcpClient
+from echoesphere_lights.client import TcpClient
 from datetime import datetime
 import logging
-from led_controller import LedController
+from echoesphere_lights.led_controller import LedController
 
 # 配置日志
 LOG_FILE = f"logs/echo_pi_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
@@ -19,19 +19,19 @@ logger = logging.getLogger("Pi")
 
 def handle_command(command: str, led: LedController):
     logger.info(f"received command: {command}")
-    match command:
-        case "green":
-            led.green_chase()
-        case "red":
-            led.red_chase()
-        case "blue":
-            led.blue_chase()
-        case "rainbow":
-            led.rainbow_chase()
-        case "breathing":
-            led.breathing()
-        case "off":
-            led.clear()
+    colors = {
+        "green": (0, 255, 0),
+        "red": (255, 0, 0),
+        "blue": (0, 0, 255),
+        "white": (255, 255, 255),
+        "yellow": (255, 255, 0),
+        "cyan": (0, 255, 255),
+        "magenta": (255, 0, 255),
+    }
+    if command == "off":
+        led.clear()
+    elif command in colors:
+        led.chase(colors[command])
 
 
 async def main():

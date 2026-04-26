@@ -66,14 +66,9 @@ class LedController:
                 positions[head] = (positions[head] + speed) % pixel_count
             hues = [(h + 0.008) % 1.0 for h in hues]
 
-    def green_chase(self):
-        self._start_effect(lambda: self._chase_loop((0, 255, 0)))
-
-    def red_chase(self):
-        self._start_effect(lambda: self._chase_loop((255, 0, 0)))
-
-    def blue_chase(self):
-        self._start_effect(lambda: self._chase_loop((0, 0, 255)))
+    def chase(self, color):
+        """Run a chase loop with the given color (r, g, b tuple)."""
+        self._start_effect(lambda: self._chase_loop(color))
 
     def rainbow_chase(self):
         self._start_effect(self._rainbow_chase_loop)
@@ -104,13 +99,5 @@ class LedController:
             self._running_thread.join(timeout=0.5)
         self._running_thread = None
 
-
-if __name__ == "__main__":
-    led = LedController()
-    try:
-        led.green_chase()
-        time.sleep(5)
-    finally:
-        led.deinit_leds()
     
     
