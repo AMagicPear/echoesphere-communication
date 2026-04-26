@@ -2,7 +2,7 @@ import asyncio
 from client import TcpClient
 from datetime import datetime
 import logging
-from led_control.led_controller import LedController
+from led_controller import LedController
 
 # 配置日志
 LOG_FILE = f"logs/echo_pi_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
