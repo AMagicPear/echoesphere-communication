@@ -19,25 +19,26 @@ logger = logging.getLogger("Pi")
 
 def handle_command(command: str, led: LedController):
     logger.info(f"received command: {command}")
-    if command == "green":
-        led.green_chase()
-    elif command == "red":
-        led.red_chase()
-    elif command == "blue":
-        led.blue_chase()
-    elif command == "rainbow":
-        led.rainbow_chase()
-    elif command == "breathing":
-        led.breathing()
-    elif command == "off":
-        led.clear()
+    match command:
+        case "green":
+            led.green_chase()
+        case "red":
+            led.red_chase()
+        case "blue":
+            led.blue_chase()
+        case "rainbow":
+            led.rainbow_chase()
+        case "breathing":
+            led.breathing()
+        case "off":
+            led.clear()
 
 
 async def main():
     led = LedController()
-    client = TcpClient(
-        "192.168.2.1", 65432, lambda cmd: handle_command(cmd, led), on_text=lambda msg: logger.info(msg)
-    )
+    client = TcpClient("192.168.2.1", 65432)
+    client.on_command += lambda msg: handle_command(msg.get("data", ""), led)
+    client.on_text += lambda msg: logger.info(msg)
     await client.connect()
     await client.send_register("raspberry_pi")
 
