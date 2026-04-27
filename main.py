@@ -28,26 +28,42 @@ def handle_command(command: str, led: LedController):
         "cyan": (0, 255, 255),
         "magenta": (255, 0, 255),
     }
+
     if command == "off":
         led.clear()
-    elif command in colors:
-        led.chase(colors[command])
+    elif command == "breathing":
+        led.breathing()
+    elif command == "rainbow":
+        led.rainbow_chase()
+    elif command.startswith("chase:"):
+        color_name = command.split(":", 1)[1]
+        if color_name in colors:
+            led.chase(colors[color_name])
+    elif command.startswith("solid:"):
+        color_name = command.split(":", 1)[1]
+        if color_name in colors:
+            led.solid(colors[color_name])
+    elif command.startswith("gain_note:"):
+        note_name = command.split(":", 1)[1]
+        color = colors["white"]
+        led.gain_note(note_name, color)
+    elif command.startswith("drop_note:"):
+        note_name = command.split(":", 1)[1]
+        led.drop_note(note_name)
+    elif command.startswith("play_note:"):
+        note_name = command.split(":", 1)[1]
+        color = colors["white"]
+        led.play_note(note_name, color)
 
 
 async def main():
-    led = LedController()
-    client = TcpClient("192.168.2.1", 65432)
+    led = LedController(num_pixels=64)
+    client = TcpClient("PerryTree.local", 65432)
     client.on_command += lambda msg: handle_command(msg.get("data", ""), led)
     client.on_text += lambda msg: logger.info(msg)
     await client.connect()
     await client.send_register("raspberry_pi")
-
-    # async def periodic_send() -> None:
-    #     for i in range(5):
-    #         await asyncio.sleep(1)
-    #         await client.send_text(f"Ping from raspberry_pi: {i}")
-
-    # send_task = asyncio.create_task(periodic_send())
+    
     try:
         await asyncio.Future()
     except KeyboardInterrupt:

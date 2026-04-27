@@ -3,13 +3,14 @@ import neopixel
 import time
 import threading
 import colorsys
+from .music_notes import music_notes_pixels_map
 
 
 class LedController:
-    def __init__(self, pixel_pin=board.D23, num_pixels: int = 150):
+    def __init__(self, pixel_pin=board.D23, num_pixels: int = 64):
         self.pixel_pin = pixel_pin
         self.pixels = neopixel.NeoPixel(
-            pixel_pin, num_pixels, auto_write=True, brightness=0.5
+            pixel_pin, num_pixels, auto_write=True, brightness=0.2
         )
         self._running_thread = None
         self._stop_flag = threading.Event()
@@ -56,9 +57,9 @@ class LedController:
                 for t in range(tail_length, 0, -1):
                     idx = (positions[head] - t) % pixel_count
                     fade = (1 - t / tail_length) * 0.9 + 0.1
-                    r, g, b = colorsys.hls_to_rgb(hues[head], 0.5 * fade, 1.0)
+                    r, g, b = colorsys.hls_to_rgb(hues[head], 0.5 * fade, 0.6)
                     self.pixels[idx] = (int(r * 255), int(g * 255), int(b * 255))
-                head_brightness = colorsys.hls_to_rgb(hues[head], 0.5, 1.0)
+                head_brightness = colorsys.hls_to_rgb(hues[head], 0.5, 0.7)
                 self.pixels[positions[head]] = (int(head_brightness[0] * 255), int(head_brightness[1] * 255), int(head_brightness[2] * 255))
             self.pixels.show()
             time.sleep(0.03)
@@ -84,6 +85,53 @@ class LedController:
     def clear(self):
         self._stop_effect()
         self.pixels.fill((0, 0, 0))
+        self.pixels.show()
+
+    def gain_note(self, note_name: str, color=(255, 255, 255)):
+        """Light up all pixels for the given note name."""
+        if note_name not in music_notes_pixels_map:
+            return
+        for idx in music_notes_pixels_map[note_name]:
+            if 0 <= idx < self.pixels.n:
+                self.pixels[idx] = color
+        self.pixels.show()
+
+    def drop_note(self, note_name: str):
+        """Turn off all pixels for the given note name."""
+        if note_name not in music_notes_pixels_map:
+            return
+        for idx in music_notes_pixels_map[note_name]:
+            if 0 <= idx < self.pixels.n:
+                self.pixels[idx] = (0, 0, 0)
+        self.pixels.show()
+
+    def play_note(self, note_name: str, color=(255, 255, 255)):
+        """Flash effect: off-on-off-on, then leave lit."""
+        if note_name not in music_notes_pixels_map:
+            return
+        indices = [idx for idx in music_notes_pixels_map[note_name] if 0 <= idx < self.pixels.n]
+
+        # Step 1: off
+        for idx in indices:
+            self.pixels[idx] = (0, 0, 0)
+        self.pixels.show()
+        time.sleep(0.1)
+
+        # Step 2: on
+        for idx in indices:
+            self.pixels[idx] = color
+        self.pixels.show()
+        time.sleep(0.1)
+
+        # Step 3: off
+        for idx in indices:
+            self.pixels[idx] = (0, 0, 0)
+        self.pixels.show()
+        time.sleep(0.1)
+
+        # Step 4: on (stay lit)
+        for idx in indices:
+            self.pixels[idx] = color
         self.pixels.show()
 
     def _start_effect(self, effect_func):
