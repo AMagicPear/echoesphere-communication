@@ -2,6 +2,7 @@ import asyncio
 from echoesphere_lights.client import TcpClient
 from datetime import datetime
 import logging
+import argparse
 from echoesphere_lights.led_controller import LedController
 
 # 配置日志
@@ -57,8 +58,15 @@ def handle_command(command: str, led: LedController):
 
 
 async def main():
-    led = LedController(num_pixels=64)
-    client = TcpClient("PerryTree.local", 65432)
+    parser = argparse.ArgumentParser(description="Echoesphere Communication Client")
+    parser.add_argument("--host", default="PerryTree.local", help="Server host address")
+    parser.add_argument("--port", type=int, default=65432, help="Server port")
+    parser.add_argument("--pixels", type=int, default=64, help="Number of LED pixels")
+    parser.add_argument("--brightness", type=float, default=0.2, help="LED brightness (0.0-1.0)")
+    args = parser.parse_args()
+
+    led = LedController(num_pixels=args.pixels, brightness=args.brightness)
+    client = TcpClient(args.host, args.port)
     client.on_command += lambda msg: handle_command(msg.get("data", ""), led)
     client.on_text += lambda msg: logger.info(msg)
     await client.connect()

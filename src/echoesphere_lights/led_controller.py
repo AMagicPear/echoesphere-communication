@@ -7,10 +7,10 @@ from .music_notes import music_notes_pixels_map
 
 
 class LedController:
-    def __init__(self, pixel_pin=board.D23, num_pixels: int = 64):
+    def __init__(self, pixel_pin=board.D23, num_pixels: int = 64, brightness: float = 0.2):
         self.pixel_pin = pixel_pin
         self.pixels = neopixel.NeoPixel(
-            pixel_pin, num_pixels, auto_write=True, brightness=0.2
+            pixel_pin, num_pixels, auto_write=True, brightness=brightness
         )
         self._running_thread = None
         self._stop_flag = threading.Event()
