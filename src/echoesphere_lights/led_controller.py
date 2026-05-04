@@ -3,7 +3,7 @@ import neopixel
 import time
 import threading
 import colorsys
-from .music_notes import music_notes_pixels_map
+from .music_notes import music_notes_pixels_map, music_notes_colors
 
 
 class LedController:
@@ -87,10 +87,12 @@ class LedController:
         self.pixels.fill((0, 0, 0))
         self.pixels.show()
 
-    def gain_note(self, note_name: str, color=(255, 255, 255)):
+    def gain_note(self, note_name: str, color=None):
         """Light up all pixels for the given note name."""
         if note_name not in music_notes_pixels_map:
             return
+        if color is None:
+            color = music_notes_colors.get(note_name, (255, 255, 255))
         for idx in music_notes_pixels_map[note_name]:
             if 0 <= idx < self.pixels.n:
                 self.pixels[idx] = color
@@ -105,10 +107,12 @@ class LedController:
                 self.pixels[idx] = (0, 0, 0)
         self.pixels.show()
 
-    def play_note(self, note_name: str, color=(255, 255, 255)):
+    def play_note(self, note_name: str, color=None):
         """Flash effect: off-on-off-on, then leave lit."""
         if note_name not in music_notes_pixels_map:
             return
+        if color is None:
+            color = music_notes_colors.get(note_name, (255, 255, 255))
         indices = [idx for idx in music_notes_pixels_map[note_name] if 0 <= idx < self.pixels.n]
 
         # Step 1: off

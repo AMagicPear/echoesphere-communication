@@ -46,15 +46,13 @@ def handle_command(command: str, led: LedController):
             led.solid(colors[color_name])
     elif command.startswith("gain_note:"):
         note_name = command.split(":", 1)[1]
-        color = colors["white"]
-        led.gain_note(note_name, color)
+        led.gain_note(note_name)
     elif command.startswith("drop_note:"):
         note_name = command.split(":", 1)[1]
         led.drop_note(note_name)
     elif command.startswith("play_note:"):
         note_name = command.split(":", 1)[1]
-        color = colors["white"]
-        led.play_note(note_name, color)
+        led.play_note(note_name)
 
 
 async def main():
