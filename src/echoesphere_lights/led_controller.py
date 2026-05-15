@@ -22,11 +22,16 @@ class LedController:
     def _chase_loop(self, color):
         for i in range(self.pixels.n):
             if self._stop_flag.is_set():
+                self.pixels.fill((0, 0, 0))
+                self.pixels.show()
                 break
             self.pixels.fill((0, 0, 0))
             self.pixels[i] = color
             self.pixels.show()
-            time.sleep(0.05)
+            time.sleep(0.015)
+        else:
+            self.pixels.fill((0, 0, 0))
+            self.pixels.show()
 
     def _breathing_loop(self):
         num_steps = 200
@@ -150,6 +155,6 @@ class LedController:
         if self._running_thread and self._running_thread.is_alive():
             self._running_thread.join(timeout=0.5)
         self._running_thread = None
-
-    
+        self.pixels.fill((0, 0, 0))
+        self.pixels.show()
     

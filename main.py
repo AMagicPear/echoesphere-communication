@@ -22,6 +22,7 @@ def handle_command(command: str, led: LedController):
     logger.info(f"received command: {command}")
     colors = {
         "green": (0, 255, 0),
+        "lightgreen": (0, 255, 128),
         "red": (255, 0, 0),
         "blue": (0, 0, 255),
         "white": (255, 255, 255),
